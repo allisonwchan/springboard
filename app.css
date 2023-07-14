@@ -1,0 +1,35 @@
+/* 
+CSS MUST KNOW
+   
+Class Selectors
+    In ascending specificity: element < multiple elements < class < ID
+    
+    id selector should only be used ONCE on each html doc
+
+Margin vs padding
+    Margin: spacing OUTSIDE element
+    Padding: spacing INSIDE element 
+*/
+
+h1 {
+    background: crimson;
+}
+
+body h1 {
+    background: olivedrab;
+}
+
+body {
+    background-color: black;
+    color: white;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    cursor: pointer;
+}
+
+.class-style {
+    background: violet;
+}
+
+#id-style {
+    background: dodgerblue;
+}
