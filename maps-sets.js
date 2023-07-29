@@ -34,6 +34,3 @@ const vowelCount = (str) => {
 
     return vowelCounts;
 }
-
-// turn str into set and then filter out unique letters?
-// if vowel in set then add to map
