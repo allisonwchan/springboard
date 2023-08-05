@@ -1,33 +1,96 @@
+// id to keep track of which element to remove
+let currentId = 0;
+
+// list of all of movies (for sorting)
+let moviesList = [];
+
 $(function() {
-    // get rid of bullet points on ul
-    $("ul").css("list-style", "none");
+  // when delete button is clicked, remove the closest parent tr
+  $("#new-movie-form").on("submit", function(e) {
+    e.preventDefault();
 
-    // add items to ul
-    $("#submit-button").on('click', function(e) {
-        e.preventDefault();
+    let title = $("#title").val();
+    let rating = $("#rating").val();
 
-        let movieTitle = $("#movie-title").val();
-        let rating = $("#rating").val();
-        let newLi = $("<li>", {text: `${movieTitle}, ${rating}`});
-        let removeBtn = $("<input>", {type: "submit", value: "Remove", class: "remove-btn"})
+    let movieData = { title, rating, currentId };
+    const HTMLtoAppend = createMovieDataHTML(movieData);
 
-        if (rating < 0 || rating > 10) {
-            alert('Movie rating must be between 0 and 10!');    
-        } 
-        
-        if (movieTitle.length < 2) {
-            alert('Movie title must have at least 2 characters!')
+    currentId++
+    moviesList.push(movieData);
 
-        } else {
-            $("ul").append(newLi);
-            newLi.append(removeBtn);
+    $("#movie-table-body").append(HTMLtoAppend);
+    $("#new-movie-form").trigger("reset");
+  });
 
-            removeBtn.on('click', function(e) {
-                e.preventDefault();
-                
-                $(e.target.parentElement).remove();
-            })
-        } 
-    })
-})
-        
+  // when the delete button is clicked, remove the closest parent tr and remove from the array of movie
+  $("tbody").on("click", ".btn.btn-danger", function(e) {
+    // find the index where this movie is
+    let indexToRemoveAt = moviesList.findIndex(movie => movie.currentId === +$(evt.target).data("deleteId"))
+    
+    // remove it from the array of movies
+    moviesList.splice(indexToRemoveAt, 1)
+
+    // remove it from the DOM
+    $(e.target)
+      .closest("tr")
+      .remove();
+    
+  });
+
+  // when an arrow is clicked
+  $(".fas").on("click", function(evt) {
+    
+    // figure out what direction to sort and the key to sort by
+    let direction = $(evt.target).hasClass("fa-sort-down") ? "down" : "up";
+    let keyToSortBy = $(evt.target).attr("id");
+    let sortedMovies = sortBy(moviesList, keyToSortBy, direction);
+    
+    // empty the table
+    $("#movie-table-body").empty();
+
+    // loop over sortedMovies and append a new row
+    for (let movie of sortedMovies) {
+      const HTMLtoAppend = createMovieDataHTML(movie);
+      $("#movie-table-body").append(HTMLtoAppend);
+    }
+
+    // toggle the arrow
+    $(evt.target).toggleClass("fa-sort-down");
+    $(evt.target).toggleClass("fa-sort-up");
+  });
+});
+
+/* accepts an array of objects and a key and sorts by that key */
+function sortBy(array, keyToSortBy, direction) {
+  return array.sort(function(a, b) {
+    // since rating is a number, convert to numbers
+    if (keyToSortBy === "rating") {
+      a[keyToSortBy] = +a[keyToSortBy];
+      b[keyToSortBy] = +b[keyToSortBy];
+    }
+
+    if (a[keyToSortBy] > b[keyToSortBy]) {
+      return direction === "up" ? 1 : -1;
+
+    } else if (b[keyToSortBy] > a[keyToSortBy]) {
+      return direction === "up" ? -1 : 1;
+    }
+
+    return 0;
+  });
+}
+
+/* createMovieDataHTML accepts an object with title and rating keys and returns a string of HTML */
+function createMovieDataHTML(data) {
+  return `
+    <tr>
+      <td>${data.title}</td>
+      <td>${data.rating}</td>
+      <td>
+        <button class="btn btn-danger" data-delete-id=${data.currentId}>
+          Delete
+        </button>
+      </td>
+    <tr>
+  `;
+}
