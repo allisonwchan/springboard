@@ -49,3 +49,11 @@ ul li {
 ul li:hover {
   background: rgb(218, 119, 27);
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(202, 101, 5);
+}
