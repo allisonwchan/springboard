@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:focus {
+  outline-color: rgb(218, 119, 27);
+  border: 3px;
+}
+
+body {
+  background-image: linear-gradient(to right, rgb(255, 215, 39), rgb(223, 111, 6));
+}
+
+.search-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input {
+  margin-top: 40vh;
+  padding: 20px 10px;
+  border: none;
+  border-bottom: solid 3px rgb(218, 119, 27);
+  font-size: 18px;
+}
+
+.search-container input,
+.search-container .suggestions {
+  width: 30%;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.suggestions {
+  max-height: 240px;
+  overflow-y: hidden;
+}
+
+ul li {
+  list-style: none;
+  padding: 15px 10px;
+  cursor: pointer;
+}
+
+ul li:hover {
+  background: rgb(218, 119, 27);
+}
