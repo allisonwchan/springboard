@@ -62,8 +62,38 @@ function showSuggestions(results, inputVal) {
 // populate search bar with text
 function useSuggestion(e) {
 	// e.target will be li
-	let selectSuggestion = e.target.innerHTML;
-	input.value = selectSuggestion;
+	let selectedSuggestion = e.target.innerHTML;
+	let strLength = selectedSuggestion.length;
+
+	// take out <b> tags from suggestion
+	let boldFirstIdx = selectedSuggestion.indexOf('<b>');
+	let boldLastIdx = selectedSuggestion.indexOf('</b>');
+
+	// get part of suggestion between <b> tags
+	let suggestionBoldPart = selectedSuggestion.substring((boldFirstIdx + 3), boldLastIdx);
+	
+	if (boldFirstIdx === 0) {
+		// if first letter is bold, fill search bar wih bold part + rest of suggestion
+		let firstPart = suggestionBoldPart;
+		let secondPart = selectedSuggestion.substring((boldLastIdx + 4), strLength);
+		input.value = firstPart + secondPart;
+
+	} else {
+		// if not first letter, get first letters, then bold part
+		let firstPart = selectedSuggestion.substring(0, boldFirstIdx);
+		let secondPart = suggestionBoldPart;
+
+		// if any letters remaining after <b> tags, add them to fill search bar
+		if ((boldLastIdx + 4) !== strLength) {
+			let thirdPart = selectedSuggestion.substring((boldLastIdx + 4), strLength);
+			input.value = firstPart + secondPart + thirdPart;
+			
+		} else {
+			input.value = firstPart + secondPart;
+		}
+	}
+
+	// input.value = selectSuggestion;
 	suggestions.innerHTML = '';
 }
 
