@@ -87,13 +87,12 @@ function useSuggestion(e) {
 		if ((boldLastIdx + 4) !== strLength) {
 			let thirdPart = selectedSuggestion.substring((boldLastIdx + 4), strLength);
 			input.value = firstPart + secondPart + thirdPart;
-			
+
 		} else {
 			input.value = firstPart + secondPart;
 		}
 	}
-
-	// input.value = selectSuggestion;
+	
 	suggestions.innerHTML = '';
 }
 
