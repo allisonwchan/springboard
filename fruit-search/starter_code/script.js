@@ -17,15 +17,12 @@ function search(str) {
 
 // with keyup, show results 
 function searchHandler(e) {
-	// e.target will be the input box
-	// e.target.value is input text
 	let inputText = e.target.value;
 	let results = search(inputText);
 	return showSuggestions(results, inputText);
 }
 
 // add items to create dropdown
-// each li should only have 1 item from results in it
 function showSuggestions(results, inputVal) {
 	// initialize with empty list of suggestions
 	suggestions.innerHTML = '';
@@ -34,7 +31,7 @@ function showSuggestions(results, inputVal) {
 		let resultLi = document.createElement('li');
 
 		// find first index where inputVal appears in a result
-		let firstIdx = r.toLowerCase().indexOf(inputVal);
+		let firstIdx = r.toLowerCase().indexOf(inputVal.toLowerCase());
 
 		if (firstIdx === 0) {
 			// bold inputVal and then add letters after firstIdx
@@ -53,7 +50,7 @@ function showSuggestions(results, inputVal) {
 			}
 
 			resultLi.innerHTML = result;
-		}
+		} 
 		
 		suggestions.appendChild(resultLi);
 	}
@@ -61,7 +58,6 @@ function showSuggestions(results, inputVal) {
 
 // populate search bar with text
 function useSuggestion(e) {
-	// e.target will be li
 	let selectedSuggestion = e.target.innerHTML;
 	let strLength = selectedSuggestion.length;
 
@@ -92,7 +88,7 @@ function useSuggestion(e) {
 			input.value = firstPart + secondPart;
 		}
 	}
-	
+
 	suggestions.innerHTML = '';
 }
 
