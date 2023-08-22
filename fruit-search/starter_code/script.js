@@ -17,8 +17,8 @@ function search(str) {
 
 // with keyup, show results 
 function searchHandler(e) {
-	let inputText = e.target.value;
-	let results = search(inputText);
+	const inputText = e.target.value;
+	const results = search(inputText);
 	return showSuggestions(results, inputText);
 }
 
@@ -31,7 +31,7 @@ function showSuggestions(results, inputVal) {
 		let resultLi = document.createElement('li');
 
 		// find first index where inputVal appears in a result
-		let firstIdx = r.toLowerCase().indexOf(inputVal.toLowerCase());
+		const firstIdx = r.toLowerCase().indexOf(inputVal.toLowerCase());
 
 		if (firstIdx === 0) {
 			// bold inputVal and then add letters after firstIdx
@@ -62,8 +62,8 @@ function useSuggestion(e) {
 	let strLength = selectedSuggestion.length;
 
 	// take out <b> tags from suggestion
-	let boldFirstIdx = selectedSuggestion.indexOf('<b>');
-	let boldLastIdx = selectedSuggestion.indexOf('</b>');
+	const boldFirstIdx = selectedSuggestion.indexOf('<b>');
+	const boldLastIdx = selectedSuggestion.indexOf('</b>');
 
 	// get part of suggestion between <b> tags
 	let suggestionBoldPart = selectedSuggestion.substring((boldFirstIdx + 3), boldLastIdx);
