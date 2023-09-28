@@ -7,6 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///blogly"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'blog'
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.app_context().push()
 
 toolbar = DebugToolbarExtension(app)
 
@@ -30,14 +31,14 @@ def users_index():
     """Show a page with info on all users"""
 
     users = User.query.order_by(User.last_name, User.first_name).all()
-    return render_template('users/index.html', users=users)
+    return render_template('users.html', users=users)
 
 
 @app.route('/users/new', methods=["GET"])
 def users_new_form():
     """Show a form to create a new user"""
 
-    return render_template('users/new.html')
+    return render_template('form.html')
 
 
 @app.route("/users/new", methods=["POST"])
@@ -60,7 +61,7 @@ def users_show(user_id):
     """Show a page with info on a specific user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('users/show.html', user=user)
+    return render_template('user-info.html', user=user)
 
 
 @app.route('/users/<int:user_id>/edit')
@@ -68,7 +69,7 @@ def users_edit(user_id):
     """Show a form to edit an existing user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('users/edit.html', user=user)
+    return render_template('edit-user.html', user=user)
 
 
 @app.route('/users/<int:user_id>/edit', methods=["POST"])
