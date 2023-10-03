@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+
+{% include 'message.html' %}
+
+<h1>Pets</h1>
+
+<div class="row">
+    {% for pet in pets %}
+
+    <div class="col-md-4">
+        <img src="{{ pet.image_url() }}" alt="image of {{ pet.name }}">
+        <a href="/{{ pet.id }}">{{ pet.name }}</a> 
+        {% if pet.available %} <b> is available!</b> {% endif %}
+        
+    </div>
+
+    {% endfor %}
+</div>
+
+<form>
+    <button class="btn btn-primary" 
+            formaction="/add"
+            formmethod="get">Add a Pet
+    </button>
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% with msg = get_flashed_messages() %}
+
+    {% if msg %}
+
+        {% for message in msg %}
+
+            <div class="col-sm-6 alert alert-dismissible">
+                <strong>{{ message }}</strong>
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}

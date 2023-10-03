@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Info about {{ pet.name }}{% endblock %}
+
+{% block content %}
+
+{% include 'message.html' %}
+
+<h1>Meet {{ pet.name}}!</h1>
+
+<div class="row">
+    
+    <div class="col-md-3">
+        <img class="img-thumbnail" src="{{ pet.image_url() }}" alt="image of {{ pet.name }}">
+    </div>
+
+    <div class="col-md-6">
+        <p>Species: {{ pet.species }}</p>
+
+        {% if pet.age %}
+            <p>Age: {{ pet.age }}</p>
+        {% endif %}
+    </div>
+    
+</div>
+
+<form>
+    <button class="btn btn-primary" 
+            formaction="/{{ pet.id }}/edit"
+            formmethod="get">Edit
+    </button>
+</form>
+
+{% endblock %}

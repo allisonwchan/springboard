@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit{% endblock %}
+
+{% block content %}
+
+<h1>Edit Info about {{ pet.name }}</h1>
+
+<form method="POST">
+    {% include "_form.html" %}
+    <div class="form-group text-right">
+        <a href="/{{ pet.id }}" class="btn btn-outline-info">Cancel</a>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+</form>
+
+{% endblock %}
