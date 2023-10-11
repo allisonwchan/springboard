@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title%}good job{% endblock %}
+
+{% block content %}
+
+<h1>Your Profile</h1>
+
+<p>{{ user.username }}</p>
+
+<a href="/users/{{ user.username }}/feedback/add">Add Feedback</a>
+
+{% endblock %}
