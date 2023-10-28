@@ -29,13 +29,13 @@ Here are a few examples to get you started with. During the proposal stage, you 
 
 | Task Name                   | Description                                                                                                   | Example                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Design Database schema      | Determine the models and database schema required for your project.                                           | [Link](https://github.com/hatchways/sb-capstone-example/issues/1) |
+| Design Database schema      | Determine the models and database schema required for your project.                                           | (will work on later) |
 | Source Your Data            | Determine where your data will come from. You may choose to use an existing API or create your own.           | [Spoonacular](https://spoonacular.com/food-api/docs) |
-| User Flows                  | Determine user flow(s) - think about what you want a user’s experience to be like as they navigate your site. | [Link](https://github.com/hatchways/sb-capstone-example/issues/3) |
-| Set up backend and database | Configure the environmental variables on your framework of choice for development and set up database.        | [Link](https://github.com/hatchways/sb-capstone-example/issues/4) |
-| Set up frontend             | Set up frontend framework of choice and link it to the backend with a simple API call.            | [Link](https://github.com/hatchways/sb-capstone-example/issues/5) |
-| Fix styling.                | Fix styling so that website looks more aesthetic. | [Link](https://github.com/hatchways/sb-capstone-example/issues/5) |
-| User Authentication         | Fullstack feature - ability to authenticate (login and sign up) as a user                                     | [Link](https://github.com/hatchways/sb-capstone-example/issues/6) |
+| User Flows                  | Determine user flow(s) - think about what you want a user’s experience to be like as they navigate your site. | Main page will have search bar for recipe, where user can look up recipes based on ingredients and filters. <br/> Results will include info about the recipe and a link to the recipe. It will be sorted by how many ingredients are missing in increasing order. <br/> For example, if user looks up recipe with tomato, cheese, basil: then top results will include only those 3 and then next results would include those 3 with 1 more ingredient, etc. |
+| Set up backend and database | Configure the environmental variables on your framework of choice for development and set up database.        | (will work on later) |
+| Set up frontend             | Set up frontend framework of choice and link it to the backend with a simple API call.            | (will work on later) |
+| Fix styling.                | Fix styling so that website looks more aesthetic. | (will work on later) |
+| User Authentication         | Fullstack feature - ability to authenticate (login and sign up) as a user                                     | Signup will ask for email and password, and maybe default filters (like vegetarian recipes only, no avocados because of allergy, etc.). Logged in users can then save recipes, make meal plans, make grocery lists, etc. <br/> (will work on code later) |
 
 ## Labeling
 
