@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Results</h1>
+
+<div class="recipe-result">
+    {% for recipe in recipes %}
+        <p>{{ recipe["title"] }}</p>
+
+        <p>Used ingredients: {{ recipe["usedIngredientCount"]}}</p>
+        {% if recipe["usedIngredients"] is not none %}
+            <ul>
+                {% for ingredient in recipe["usedIngredients"] %}
+                    <li>{{ ingredient["name"] }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p>Missed ingredients: {{ recipe["missedIngredientCount"] }}</p>
+        {% if recipe["missedIngredients"] is not none %}
+        <ul>
+            {% for ingredient in recipe["missedIngredients"] %}
+                <li>{{ ingredient["name"] }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a href="/recipes/detail">More</a>
+    {% endfor %}
+</div>
+
+{% endblock %}
