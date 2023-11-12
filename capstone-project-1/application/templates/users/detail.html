@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ user.username }}</h1>
+
+<h2>Saved Recipes</h2>
+
+<ul>
+    {% for recipe in user.recipes %}
+        <li><a href="/recipes/{{ recipe.api_id }}">{{ recipe.title }}</a></li>
+    {% endfor %}
+</ul>
+
+<div class="row">
+    <div class="col-md-6 col-lg-2">
+        <a class="btn btn-outline-primary" href="/users/{{ user.id }}/update">
+            Update profile
+        </a>
+        <form method="POST" action="/users/delete">
+            <button class="btn btn-outline-danger">
+                Delete profile
+            </button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

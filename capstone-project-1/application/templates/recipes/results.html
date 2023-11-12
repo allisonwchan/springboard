@@ -2,32 +2,50 @@
 
 {% block content %}
 
-<h1>Results</h1>
+<h1>Results for '{{ query }}'</h1>
 
-<div class="recipe-result">
+<div class="row">
     {% for recipe in recipes %}
-        <p>{{ recipe["title"] }}</p>
+    <div class="card border-light" style="max-width: 23.5rem;">
+        <div class="card-body">
+            <div class="position-relative">
+                <a href="/recipes/{{ recipe['id'] }}" target="_blank" rel="noopener noreferrer">
+                    <img class="card-img-top" src="{{ recipe['image'] }}" alt="Recipe image">
+                </a>
+                
+                {% if g.user %}
+                <form method="POST" action="/users/save_recipe/{{ recipe['id'] }}/{{ recipe['title'] }}/{{ page }}" class="position-absolute top-0 start-1">
+                    <button class="
+                    btn 
+                    btn-sm 
+                    {{'btn-primary' if recipe['id'] in api_ids else 'btn-secondary'}}"
+                    >
+                    <i class="bi bi-bookmark"></i>
+                    </button>
+                </form>
+                {% else %}
+                <form method="GET" action="/login" class="position-absolute top-0 start-1">
+                    <button class="
+                    btn 
+                    btn-sm 
+                    btn-secondary"
+                    >
+                    <i class="bi bi-bookmark"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
 
-        <p>Used ingredients: {{ recipe["usedIngredientCount"]}}</p>
-        {% if recipe["usedIngredients"] is not none %}
-            <ul>
-                {% for ingredient in recipe["usedIngredients"] %}
-                    <li>{{ ingredient["name"] }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        <p>Missed ingredients: {{ recipe["missedIngredientCount"] }}</p>
-        {% if recipe["missedIngredients"] is not none %}
-        <ul>
-            {% for ingredient in recipe["missedIngredients"] %}
-                <li>{{ ingredient["name"] }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-
-        <a href="/recipes/detail">More</a>
-    {% endfor %}
+            <h4 class="card-title">{{ recipe["title"] }}</h4>
+            
+        </div>
+      </div>
+      {% endfor %}
 </div>
+
+
+
+
+
 
 {% endblock %}

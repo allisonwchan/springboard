@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
+DEFAULT_IMAGE_URL = "https://tse1.explicit.bing.net/th?id=OIP.GHGGLYe7gDfZUzF_tElxiQHaHa&pid=Api&P=0&h=220"
 
 class User(db.Model):
     """User in the system."""
@@ -31,7 +32,7 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default=DEFAULT_IMAGE_URL
     )
 
     password = db.Column(
@@ -39,11 +40,22 @@ class User(db.Model):
         nullable=False,
     )
 
+    diet = db.Column(
+        db.Text
+    )
+
+    allergies = db.Column(
+        db.Text,
+        default=None
+    )
+
+    recipes = db.relationship('Recipe', backref='users', lazy=True)
+
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
 
     @classmethod
-    def signup(cls, username, email, password, image_url):
+    def signup(cls, username, email, password, image_url, diet, allergies):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -56,6 +68,8 @@ class User(db.Model):
             email=email,
             password=hashed_pwd,
             image_url=image_url,
+            diet=diet,
+            allergies=allergies
         )
 
         db.session.add(user)
@@ -81,12 +95,42 @@ class User(db.Model):
 
         return False
     
+    @classmethod
+    def is_saved(self, other_recipe):
+        """Is recipe saved by user?"""
+
+        found_recipe_list = [recipe for recipe in self.saved_recipes if recipe == other_recipe]
+        return len(found_recipe_list) == 1
+
+
+class Recipe(db.Model):
+    """Recipe model."""
+
+    __tablename__ = 'recipes'
+    
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    api_id = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    title = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
 
 def connect_db(app):
-    """Connect this database to provided Flask app.
-
-    You should call this in your Flask app.
-    """
+    """Connect this database to provided Flask app."""
 
     db.app = app
     db.init_app(app)

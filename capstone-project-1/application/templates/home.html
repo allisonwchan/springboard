@@ -4,19 +4,23 @@
 
 <h1>Find your new favorite recipes.</h1>
 
-<h2>Search ingredients</h2>
+<form method="POST" id="search-form">
+  {{ form.hidden_tag() }}
+
+  {% for field in form if field.widget.input_type != 'hidden' %}
+    {% for error in field.errors %}
+      <span class="text-danger">{{ error }}</span>
+    {% endfor %}
+    {{ field(placeholder=field.label.text, class="form-control") }}
+  {% endfor %}
+
+  <button class="btn btn-primary btn-md btn-block"><i class="bi bi-search"></i></button>
+</form>
 
 <div>
-  <form class="d-flex">
-      <input class="form-control me-sm-2" type="search" placeholder="Enter ingredients (tomato, cheese, basil, etc.)">
-      <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
-    </form>
+  <a href="/advanced-search">Advanced search</a>
+</div>
 
-    <div>
-      <ul>
-      </ul> 
-    </div>
 
-  </div>
 
 {% endblock %}
