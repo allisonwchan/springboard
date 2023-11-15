@@ -20,6 +20,10 @@ sort_choices = [('none', 'None'),
                 ('calories', 'Calories'),
                 ('time', 'Cooking time')]
 
+sort_directions = [('none', 'None'),
+                   ('asc', 'Ascending'),
+                   ('desc', 'Descending')]
+
 meal_choices = [('none', 'None'),
                 ('main-course', 'Main course'),
                 ('side-dish', 'Side dish'),
@@ -42,8 +46,10 @@ class UserUpdateForm(FlaskForm):
     """Form for updating user info."""
 
     username = StringField('Username', validators=[DataRequired()])
-    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     image_url = StringField('(Optional) Image URL', validators=[URL()])
+    diet = SelectField('(Optional) Diet', choices=diet_choices)
+    allergies = TextAreaField('(Optional) Allergies')
 
     # just check that input password matches current password
     password = PasswordField('Password', validators=[DataRequired()])
@@ -59,17 +65,18 @@ class LoginForm(FlaskForm):
 class SearchForm(FlaskForm):
     """Basic recipe search bar."""
 
-    query = StringField('What are you craving today? Pasta, rice, etc.', validators=[DataRequired()])
+    query = StringField('What are you craving today? (Such as pasta, rice, etc.)', validators=[DataRequired()])
     
 
 class AdvancedSearchForm(FlaskForm):
     """Form for advanced search of recipes.
     Variable names correspond to the names used in the API."""
 
-    query = StringField('What are you craving today? Pasta, rice, etc.', validators=[DataRequired()])
+    query = StringField('What are you craving today? (Such as pasta, rice, etc.)', validators=[DataRequired()])
     includeIngredients = TextAreaField('What ingredients do you have?', validators=[DataRequired()])
     number = IntegerField('How many recipes?', validators=[NumberRange(min=1, max=100)])
     diet = SelectField('Any dietary restrictions?', choices=diet_choices)
     excludeIngredients = TextAreaField('(Optional) Any ingredients to exclude, like allergies?')
     sort = SelectField('(Optional) How should recipes be sorted?', choices=sort_choices)
+    sortDirection = SelectField('(Optional) Sort in ascending or descending order?', choices=sort_directions)
     type = SelectField('(Optional) What kind of meal?', choices=meal_choices)

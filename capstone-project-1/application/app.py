@@ -1,31 +1,23 @@
 import os
 
-from flask import Flask, render_template, request, flash, redirect, session, g
-from sqlalchemy.exc import IntegrityError, InvalidRequestError
+from flask import Flask, render_template, request, flash, redirect, session, g, url_for
+from sqlalchemy.exc import IntegrityError
 import requests
 from werkzeug.datastructures import MultiDict
 
 from forms import UserAddForm, UserUpdateForm, LoginForm, SearchForm, AdvancedSearchForm
 from models import db, connect_db, User, Recipe
 from secret_keys import API_SECRET_KEY
-from sample_data.complex_search import complex_search
-from sample_data.recipe_info import recipe_info
-from sample_data.recipes_by_ingredients import recipes_by_ingredients
-from sample_data.similar_recipes import similar_recipes
 
 CURR_USER_KEY = "curr_user"
 BASE_URL = "https://api.spoonacular.com/recipes"
 
 app = Flask(__name__)
-
-# Get DB_URI from environ variable (useful for production/testing) or,
-# if not set there, use development local db.
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgresql:///recipes'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 app.app_context().push()
@@ -58,6 +50,7 @@ def do_logout():
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
 
 ###############################################################################
 # Signup, login, logout routes 
@@ -93,8 +86,6 @@ def signup():
 
             return redirect("/")
         
-        # find way to separate username and email validation
-        # both are IntegrityError
         except IntegrityError:
             flash("Username or email already taken", 'danger')
             return render_template('users/signup.html', form=form)
@@ -139,26 +130,42 @@ def logout():
 def show_homepage():
     """Show homepage and simple recipe search form."""
 
+    default_num_recipes = 3
+
+    if g.user and g.user.diet != 'none':
+        resp = requests.get(f"{BASE_URL}/random",
+                            params={"tags": g.user.diet,
+                                    "number": default_num_recipes,
+                                    "apiKey": API_SECRET_KEY})
+    
+    else:
+        resp = requests.get(f"{BASE_URL}/random",
+                                params={"number": default_num_recipes,
+                                        "apiKey": API_SECRET_KEY})
+            
+    json = resp.json()
+    recipes = json["recipes"]
+
     form = SearchForm()
     if form.validate_on_submit():
         query = form.query.data
 
         return redirect(f"/recipes/results?query={query}")
     
-    return render_template('home.html', form=form)
+    return render_template('home.html', 
+                           form=form,
+                           recipes=recipes,
+                           page='random')
 
 
 @app.route('/advanced-search', methods=['GET', 'POST'])
 def show_advanced_search():
     """Show and perform advanced search."""
 
-    if not g.user:
-        return redirect('/login')
-
-    if request.method == 'GET':
+    if request.method == 'GET' and g.user:
         form = AdvancedSearchForm(formdata=MultiDict({'diet': g.user.diet, 
                                                       'excludeIngredients': g.user.allergies}))
-    else:
+    else:      
         form = AdvancedSearchForm()
 
     if form.validate_on_submit():
@@ -170,36 +177,16 @@ def show_advanced_search():
 
 ##############################################################################
 # Recipe routes
-# use example data to test data extraction methods (includeIngredients = "pasta")
-
-@app.route('/recipes')
-def show_recipes():
-    """Show 50 random recipes based on user's default preferences."""
-
-    if not g.user:
-        return redirect('/login')
-    
-    default_num_recipes = 2
-
-    resp = requests.get(f"{BASE_URL}/random",
-                        params={"tags": {g.user.diet},
-                                "number": default_num_recipes,
-                                "apiKey": API_SECRET_KEY})
-
-    json = resp.json()
-    recipes = json["recipes"]
-
-    return render_template('recipes/list.html', 
-                           recipes=recipes,
-                           page='random')
-
 
 @app.route('/recipes/results')
 def show_results():
     """Show recipes that include ingredients inputted by user.
     Return 30 recipes by default."""
 
-    default_num_recipes = 2
+    default_num_recipes = 3
+
+    if request.args.get("query") is None:
+        return redirect("/")
 
     resp = requests.get(f"{BASE_URL}/complexSearch",
                         params={"query": request.args.get("query"),
@@ -208,6 +195,7 @@ def show_results():
                                 "diet": request.args.get("diet") or None,
                                 "excludeIngredients": request.args.get("excludeIngredients") or None,
                                 "sort": request.args.get("sort") or None,
+                                "sortDirection": request.args.get("sort") or 'asc',
                                 "type": request.args.get("type") or None,
                                 "apiKey": API_SECRET_KEY})
     json = resp.json()
@@ -218,41 +206,27 @@ def show_results():
         flash(f"No recipes found for '{request.args.get('query')}'.", "danger")
         return redirect("/")
 
-    saved_recipes = g.user.recipes
-    api_ids = [recipe.api_id for recipe in saved_recipes]
-
     return render_template('recipes/results.html', 
                            query=request.args.get("query"),
                            recipes=recipes,
-                           api_ids=api_ids,
                            page='results')
 
 
-# @app.route('/recipes/<int:recipe_api_id>')
-# def show_recipe_info(recipe_api_id):
-#     """Show details about a recipe."""
-
-#     resp = requests.get(f"{BASE_URL}/{recipe_api_id}/information",
-#                         params={"apiKey": API_SECRET_KEY})
-#     json = resp.json()
-    
-#     return render_template('recipes/detail.html', 
-#                            recipe_info=json)
-
-
-@app.route('/recipes/detail')
-def show_recipe_info():
+@app.route('/recipes/<int:recipe_api_id>')
+def show_recipe_info(recipe_api_id):
     """Show details about a recipe."""
 
-    saved_recipes = g.user.recipes
-    api_ids = [recipe.api_id for recipe in saved_recipes]
+    resp = requests.get(f"{BASE_URL}/{recipe_api_id}/information",
+                        params={"apiKey": API_SECRET_KEY})
+    json = resp.json()
+
+    similar_recipes = requests.get(f"{BASE_URL}/{recipe_api_id}/similar",
+                                   params={"apiKey": API_SECRET_KEY}).json()
     
     return render_template('recipes/detail.html', 
-                           recipe_info=recipe_info,
-                           api_ids=api_ids,
+                           recipe_info=json,
                            similar_recipes=similar_recipes,
-                           page='detail'
-                           )
+                           page='detail')
 
 
 ##############################################################################
@@ -270,7 +244,11 @@ def show_users():
 def show_user_info(user_id):
     """Show user's info."""
 
-    return render_template("users/detail.html", user=User.query.get_or_404(user_id))
+    user = User.query.get_or_404(user_id)
+
+    return render_template("users/detail.html", 
+                           user=user,
+                           page='user_detail')
 
 
 @app.route('/users/<int:user_id>/update', methods=["GET", "POST"])
@@ -285,7 +263,9 @@ def update_user_info(user_id):
     if request.method == 'GET':
         form = UserUpdateForm(formdata=MultiDict({'username': user.username, 
                                                   'email': user.email, 
-                                                  'image_url': user.image_url}))
+                                                  'image_url': user.image_url,
+                                                  'diet': user.diet,
+                                                  'allergies': user.allergies}))
     else:
         form = UserUpdateForm()
 
@@ -299,6 +279,8 @@ def update_user_info(user_id):
             user.username = form.username.data
             user.email = form.email.data
             user.image_url=form.image_url.data or User.image_url.default.arg
+            user.diet = form.diet.data
+            user.allergies = form.allergies.data or None
             db.session.commit()
 
             flash("Successfully updated profile.", "success")
@@ -317,7 +299,6 @@ def delete_user():
     """Delete user."""
 
     if not g.user:
-        flash("Access unauthorized.", "danger")
         return redirect("/")
 
     do_logout()
@@ -328,51 +309,59 @@ def delete_user():
     flash("Successfully deleted profile.", "success")
     return redirect("/signup")
 
-@app.route('/users/save_recipe/<int:recipe_api_id>/<recipe_title>/<page>', methods=['POST'])
-def save_recipe(recipe_api_id, recipe_title, page):
+
+@app.route('/users/save_recipe/<int:api_id>/<page>', methods=['POST'])
+def save_recipe(api_id, page):
     """Save a recipe."""
 
     if not g.user:
         return redirect('/login')
+    
+    resp = requests.get(f"{BASE_URL}/{api_id}/information",
+                        params={"apiKey": API_SECRET_KEY})
+    json = resp.json()
 
     # check if recipe_id is in database; if not, add it
-    recipes = Recipe.query.filter_by(api_id=recipe_api_id, user_id=g.user.id).all()
+    recipes = Recipe.query.filter_by(api_id=api_id, user_id=g.user.id).all()
     if len(recipes) == 0:
-        recipe = Recipe(api_id=recipe_api_id,
-                        title=recipe_title,
+        recipe = Recipe(api_id=api_id,
+                        title=json['title'],
+                        image=json['image'],
                         user_id=g.user.id)
         
         db.session.add(recipe)
         db.session.commit()
         
     flash("Recipe saved.", "success")
-
-    # redirect to different pages depending on where user saved a recipe
-    if page == 'result':
-        return redirect('/recipes/results')
+    
+    if page == 'results':
+        return redirect(url_for('show_results'))
     elif page == 'detail':
-        return redirect('/recipes/detail')
-    else:
-        return redirect('/recipes')
+        return redirect(url_for('show_recipe_info'))
+    elif page == 'user_detail':
+        return redirect(url_for('show_user_info', user_id=g.user.id))
+    elif page == 'home':
+        return redirect(url_for('show_homepage'))
     
 
-@app.route('/users/unsave_recipe/<int:recipe_api_id>/<page>', methods=['POST'])
-def unsave_recipe(recipe_api_id, page):
+@app.route('/users/unsave_recipe/<int:api_id>/<page>', methods=['POST'])
+def unsave_recipe(api_id, page):
     """Unsave a recipe."""
 
     if not g.user:
         return redirect('/login')
 
-    recipe = Recipe.query.filter_by(api_id=recipe_api_id, user_id=g.user.id).first()
+    recipe = Recipe.query.filter_by(api_id=api_id, user_id=g.user.id).first()
     db.session.delete(recipe)
     db.session.commit()
         
     flash("Recipe unsaved.", "success")
-
-    # redirect to different pages depending on where user unsaved a recipe
-    if page == 'result':
-        return redirect('/recipes/results')
+    
+    if page == 'results':
+        return redirect(url_for('show_results'))
     elif page == 'detail':
-        return redirect('/recipes/detail')
-    else:
-        return redirect('/recipes')
+        return redirect(url_for('show_recipe_info'))
+    elif page == 'user_detail':
+        return redirect(url_for('show_user_info', user_id=g.user.id))
+    elif page == 'home':
+        return redirect(url_for('show_homepage'))

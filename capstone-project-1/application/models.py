@@ -95,11 +95,10 @@ class User(db.Model):
 
         return False
     
-    @classmethod
     def is_saved(self, other_recipe):
         """Is recipe saved by user?"""
 
-        found_recipe_list = [recipe for recipe in self.saved_recipes if recipe == other_recipe]
+        found_recipe_list = [recipe for recipe in self.recipes if recipe == other_recipe]
         return len(found_recipe_list) == 1
 
 
@@ -123,9 +122,13 @@ class Recipe(db.Model):
         nullable=False
     )
 
+    image = db.Column(
+        db.Text
+    )
+
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id'),
+        db.ForeignKey('users.id', ondelete='cascade'),
         nullable=False
     )
 

@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<div class="row justify-content-md-center">
-    <div class="col-md-7 col-lg-5">
+<div class="row justify-content-center">
+    <div class="col-md-7">
         <h2>Advanced Search</h2>
         <form method="POST" id="advanced-search">
             {{ form.hidden_tag() }}
@@ -12,11 +12,11 @@
             {% for error in field.errors %}
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
-            {{ field.label}}
-            {{ field(placeholder=field.label.text, class="form-control") }}
+            {{ field.label }}
+            {{ field(class="form-control") }}
             {% endfor %}
     
-            <button class="btn btn-primary btn-lg btn-block">Search recipes!</button>
+            <button class="btn btn-primary btn-lg btn-block mt-3">Search recipes!</button>
         </form>
     </div>
   </div>
