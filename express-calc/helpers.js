@@ -11,8 +11,15 @@ function getMedian(nums) {
     }
 }
 
+function createFrequencyCounter(arr) {
+    return arr.reduce(function(acc, next) {
+      acc[next] = (acc[next] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
 function getMode(nums) {
-    let freqCounter = createFrequencyCounter(arr);
+    let freqCounter = createFrequencyCounter(nums);
 
     let count = 0;
     let mostFrequent;
@@ -24,8 +31,7 @@ function getMode(nums) {
         }
     }
 
-  return mostFrequent;
-
+    return mostFrequent;
 }
 
 function stringToNumber(numsList) {

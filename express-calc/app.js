@@ -70,6 +70,30 @@ app.get('/mode', (req, res) => {
     return res.send(result);
 })
 
+app.get('/all', (req, res) => {
+    
+    let nums = req.query.nums;
+
+    if (nums.length === 0) {
+        throw new CustomError("No numbers provided", 400);
+    }
+
+    const numsList = stringToNumber(nums.split(','));
+
+    if (numsList instanceof Error) {
+        throw new CustomError(numsList.message);
+    }
+
+    let result = {
+        operation: "all",
+        mean: getMean(numsList),
+        median: getMedian(numsList),
+        mode: getMode(numsList)
+    }
+
+    return res.send(result);
+})
+
 /** general error handler */
 
 app.use(function (req, res, next) {
