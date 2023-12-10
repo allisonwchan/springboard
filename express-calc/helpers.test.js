@@ -18,8 +18,8 @@ describe("mode", function() {
     })
 })
 
-describe("validateNumbers", function() {
+describe("stringToNumber", function() {
     it("converts a list of strings to numbers if valid", function() {
-        expect(stringToNumber(['1', '2', '3', '4'])).toBe([1, 2, 3, 4]);
+        expect(stringToNumber(['1', '2', '3', '4'])).toStrictEqual([1, 2, 3, 4]);
     })
 })
