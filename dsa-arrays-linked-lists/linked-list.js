@@ -37,13 +37,11 @@ class LinkedList {
   push(val) {
     let newNode = new Node(val);
 
-    if (!this.head) {
-      this.head = newNode;
-      this.tail = this.head;
-    } else {
-      this.tail.next = null;
-      this.tail = newNode;
-    }
+    if (this.head === null) this.head = newNode;
+
+    if (this.tail !== null) this.tail.next = newNode;
+
+    this.tail = newNode;
 
     this.length += 1;
   }
@@ -171,3 +169,9 @@ class LinkedList {
 }
 
 module.exports = LinkedList;
+
+let ll = new LinkedList();
+// let newNode = new Node(5);
+ll.unshift(5);
+ll.unshift(4);
+console.log(ll);
