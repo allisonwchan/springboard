@@ -1,5 +1,4 @@
 const express = require("express");
-const axios = require('axios');
 const slugify = require("slugify");
 const router = new express.Router();
 const db = require("../db");
@@ -22,14 +21,21 @@ router.get("/companies", async function (req, res, next) {
 router.get("/companies/:code", async function (req, res, next) {
     try {
         const results = await db.query(
-            `SELECT * FROM companies WHERE code = $1`, [req.params.code]
+            `SELECT c.code, c.name, c.description, ci.industry_code 
+                FROM companies as c
+                    JOIN companies_industries as ci
+                    ON c.code = ci.comp_code
+                WHERE code = $1`, [req.params.code]
         );
 
         if (results.rows.length === 0) {
             throw new ExpressError(`Company with code ${req.params.code} not found`, 404);
         }
+
+        let {code, name, description} = results.rows[0];
+        let industries = results.rows.map(r => r.industry_code);
         
-        return res.json(results.rows);
+        return res.json({ code, name, description, industries });
 
     } catch (err) {
         next(err);
