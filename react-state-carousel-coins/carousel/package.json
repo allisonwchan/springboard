@@ -3,16 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "*",
     "@testing-library/react": "*",
     "@testing-library/user-event": "*",
     "bootstrap-icons": "^1.8.3",
+    "node": "16.13.0",
     "react": "*",
     "react-dom": "*",
     "react-scripts": "*",
+    "react-testing-library": "^8.0.1",
     "web-vitals": "*"
   },
   "scripts": {
+    "v": "node -v",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -32,5 +34,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.2.0"
   }
 }
